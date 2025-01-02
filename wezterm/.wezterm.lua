@@ -1,5 +1,8 @@
 local wezterm = require("wezterm")
-local config = wezterm.config_builder()
+local config = {}
+if wezterm.config_builder then
+  config = wezterm.config_builder()
+end
 
 --! Shell
 config.default_prog = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
@@ -52,6 +55,26 @@ config.keys = {
     action = wezterm.action.ActivatePaneDirection("Right"),
   },
   {
+    key = "t",
+    mods = "LEADER",
+    action = wezterm.action.PromptInputLine({
+      description = "Enter a new title for tab",
+      action = wezterm.action_callback(function(window, _, line)
+        -- `line` is `nil` if escape character is sent
+        -- `line` is '' if enter key is pressed without entering anything
+        -- `line` is [str] if enter key is pressed
+        if line then
+          window:active_tab():set_title(line)
+        end
+      end),
+    }),
+  },
+  {
+    key = "d",
+    mods = "LEADER",
+    action = wezterm.action.ShowDebugOverlay,
+  },
+  {
     key = "1",
     mods = "LEADER",
     action = wezterm.action.ActivateTab(0),
@@ -93,7 +116,7 @@ config.keys = {
   },
 }
 
---! Appeareance
+--! Appearance
 config.max_fps = 120
 config.front_end = "WebGpu"
 for _, gpu in ipairs(wezterm.gui.enumerate_gpus()) do
@@ -104,45 +127,103 @@ for _, gpu in ipairs(wezterm.gui.enumerate_gpus()) do
   end
 end
 
---[appeareance] Colors
--- Modified version of kanagawa
-local colors = {
-  foreground = "#dcd7ba",
-  background = "#1f1f28",
-  cursor_bg = "#c8c093",
-  cursor_fg = "#c8c093",
-  cursor_border = "#c8c093",
-  selection_fg = "#c8c093",
-  selection_bg = "#2d4f67",
-  scrollbar_thumb = "#16161d",
-  split = "#16161d",
-  ansi = { "#090618", "#c34043", "#76946a", "#c0a36e", "#7e9cd8", "#957fb8", "#6a9589", "#c8c093" },
-  brights = { "#727169", "#e82424", "#98bb6c", "#e6c384", "#7fb4ca", "#938aa9", "#7aa89f", "#dcd7ba" },
-  indexed = { [16] = "#ffa066", [17] = "#ff5d62" },
+--[appearance] Colors
+-- Uses kanagawa-dragon color palette
+local colorScheme = {
+  foreground = "#c5c9c5",
+  background = "#181616",
+  cursor_bg = "#C8C093",
+  cursor_fg = "#C8C093",
+  cursor_border = "#C8C093",
+  selection_fg = "#C8C093",
+  selection_bg = "#2D4F67",
+  scrollbar_thumb = "#16161D",
+  split = "#16161D",
+  ansi = { "#0D0C0C", "#C4746E", "#8A9A7B", "#C4B28A", "#8BA4B0", "#A292A3", "#8EA4A2", "#C8C093" },
+  brights = { "#A6A69C", "#E46876", "#87A987", "#E6C384", "#7FB4CA", "#938AA9", "#7AA89F", "#C5C9C5" },
 }
-config.colors = colors
+local bg_tab_bar = colorScheme.background
+local fg_tab_bar = "#dcd7ba"
+local tab_bar_colors = {
+  background = bg_tab_bar,
+  active_tab = {
+    bg_color = "#49443C",
+    fg_color = colorScheme.foreground,
+    intensity = "Bold",
+  },
+  inactive_tab = {
+    bg_color = bg_tab_bar,
+    fg_color = fg_tab_bar,
+    intensity = "Half",
+  },
+  inactive_tab_hover = {
+    bg_color = bg_tab_bar,
+    fg_color = fg_tab_bar,
+    intensity = "Normal",
+    italic = true,
+  },
+  new_tab = {
+    bg_color = bg_tab_bar,
+    fg_color = fg_tab_bar,
+    intensity = "Half",
+  },
+  new_tab_hover = {
+    bg_color = bg_tab_bar,
+    fg_color = fg_tab_bar,
+    intensity = "Normal",
+    italic = true,
+  },
+}
+colorScheme.tab_bar = tab_bar_colors
+config.colors = colorScheme
+config.force_reverse_video_cursor = true
 
---[appeareance] Window
+--[appearance] Window
+config.default_cwd = "D:"
+config.window_background_opacity = 0.8
 config.window_frame = {
-  active_titlebar_bg = colors.background,
+  active_titlebar_bg = colorScheme.background,
 }
 config.inactive_pane_hsb = {
-  saturation = 1,
-  brightness = 1,
+  saturation = 0.9,
+  brightness = 0.7,
 }
 config.window_padding = {
   left = 0,
   right = 0,
-  top = 5,
-  bottom = 5,
+  top = 4,
+  bottom = 4,
 }
 
---[appeareance] Tab
+--[appearance] Tab
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = true
+config.tab_bar_at_bottom = false
+config.hide_tab_bar_if_only_one_tab = false
+wezterm.on("format-tab-title", function(tab, _, _, _, _, max_width)
+  local function get_title()
+    if tab.tab_title and #tab.tab_title > 0 then
+      return wezterm.truncate_right(tab.tab_title, max_width - 1)
+    end
+    return tab.active_pane.title
+  end
+  local title = string.format(" %s ", get_title())
+  if not tab.is_active then
+    edge_foreground = colorScheme.tab_bar.background
+  end
+  return {
+    { Text = title },
+    { Background = { Color = colorScheme.tab_bar.background } },
+    {
+      Foreground = {
+        Color = tab.is_active and colorScheme.tab_bar.active_tab.bg_color or colorScheme.tab_bar.background,
+      },
+    },
+    { Text = wezterm.nerdfonts.ple_lower_left_triangle },
+  }
+end)
 
---[appeareance] Font
+--[appearance] Font
 config.font = wezterm.font("Cascadia Code")
 config.font_size = 12.0
 config.freetype_load_target = "Normal"

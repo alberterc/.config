@@ -34,7 +34,7 @@ return {
 
     ---@diagnostic disable-next-line: duplicate-set-field
     statusline.section_filename = function()
-      return "%f"
+      return "%{expand('%:~:.')!=#''?expand('%:~:.'):'[No Name]'}"
     end
   end,
 }

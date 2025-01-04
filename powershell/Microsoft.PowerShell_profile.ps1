@@ -136,7 +136,7 @@ $($PSStyle.Foreground.Yellow)Overview:
         # Check for profile update
         if ($update) {
             try {
-                $url = "https://raw.githubusercontent.com/alberterc/dev-config/refs/heads/main/powershell/Microsoft.PowerShell_profile.ps1"
+                $url = "https://raw.githubusercontent.com/alberterc/.config/refs/heads/main/powershell/Microsoft.PowerShell_profile.ps1"
                 $prevHash = Get-FileHash $PROFILE
                 Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
                 $newHash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"

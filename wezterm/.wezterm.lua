@@ -5,7 +5,7 @@ if wezterm.config_builder then
 end
 
 --! Shell
-config.default_prog = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
+config.default_prog = { "C:/Program Files/PowerShell/7/pwsh.exe" }
 
 --! Keybinds
 config.leader = { key = "w", mods = "ALT" }
@@ -117,11 +117,9 @@ config.keys = {
 }
 
 --! Appearance
-config.max_fps = 120
 config.front_end = "WebGpu"
 for _, gpu in ipairs(wezterm.gui.enumerate_gpus()) do
-  if gpu.backend == "Dx12" and gpu.device_type == "DiscreteGpu" then
-    config.webgpu_power_preference = "HighPerformance"
+  if gpu.backend == "Vulkan" and gpu.device_type == "DiscreteGpu" then
     config.webgpu_preferred_adapter = gpu
     break
   end
@@ -138,49 +136,49 @@ local colorScheme = {
   selection_fg = "#C8C093",
   selection_bg = "#2D4F67",
   scrollbar_thumb = "#16161D",
-  split = "#16161D",
   ansi = { "#0D0C0C", "#C4746E", "#8A9A7B", "#C4B28A", "#8BA4B0", "#A292A3", "#8EA4A2", "#C8C093" },
   brights = { "#A6A69C", "#E46876", "#87A987", "#E6C384", "#7FB4CA", "#938AA9", "#7AA89F", "#C5C9C5" },
 }
-local bg_tab_bar = colorScheme.background
-local fg_tab_bar = "#dcd7ba"
 local tab_bar_colors = {
-  background = bg_tab_bar,
+  background = colorScheme.background,
   active_tab = {
     bg_color = "#49443C",
     fg_color = colorScheme.foreground,
     intensity = "Bold",
   },
   inactive_tab = {
-    bg_color = bg_tab_bar,
-    fg_color = fg_tab_bar,
-    intensity = "Half",
+    bg_color = colorScheme.background,
+    fg_color = colorScheme.foreground,
+    intensity = "Normal",
   },
   inactive_tab_hover = {
-    bg_color = bg_tab_bar,
-    fg_color = fg_tab_bar,
+    bg_color = colorScheme.background,
+    fg_color = colorScheme.foreground,
     intensity = "Normal",
     italic = true,
   },
   new_tab = {
-    bg_color = bg_tab_bar,
-    fg_color = fg_tab_bar,
+    bg_color = colorScheme.background,
+    fg_color = colorScheme.foreground,
     intensity = "Half",
   },
   new_tab_hover = {
-    bg_color = bg_tab_bar,
-    fg_color = fg_tab_bar,
+    bg_color = colorScheme.background,
+    fg_color = colorScheme.foreground,
     intensity = "Normal",
     italic = true,
   },
 }
 colorScheme.tab_bar = tab_bar_colors
+colorScheme.split = colorScheme.background
 config.colors = colorScheme
 config.force_reverse_video_cursor = true
 
 --[appearance] Window
 config.default_cwd = "D:"
-config.window_background_opacity = 0.8
+config.window_background_opacity = 0.775
+-- NOTE: Using "Acrylic" causes window to lag when moving around in desktop
+config.win32_system_backdrop = "Acrylic"
 config.window_frame = {
   active_titlebar_bg = colorScheme.background,
 }

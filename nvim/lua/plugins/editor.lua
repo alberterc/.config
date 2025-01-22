@@ -104,33 +104,6 @@ return {
       filters = {
         dotfiles = false,
       },
-      -- Show explorer window in the middle of the screen
-      view = {
-        float = {
-          enable = true,
-          open_win_config = function()
-            local screenW = vim.opt.columns:get()
-            local screenH = vim.opt.lines:get() - vim.opt.cmdheight:get()
-            local windowW = screenW * 0.5
-            local windowH = screenH * 0.8
-            local windowWInt = math.floor(windowW)
-            local windowHInt = math.floor(windowH)
-            local centerX = (screenW - windowW) / 2
-            local centerY = ((vim.opt.lines:get() - windowH) / 2) - vim.opt.cmdheight:get()
-            return {
-              border = "rounded",
-              relative = "editor",
-              row = centerY,
-              col = centerX,
-              width = windowWInt,
-              height = windowHInt,
-            }
-          end,
-        },
-        width = function()
-          return math.floor(vim.opt.columns:get() * 0.5)
-        end,
-      },
     },
   },
 }

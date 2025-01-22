@@ -176,9 +176,9 @@ config.force_reverse_video_cursor = true
 
 --[appearance] Window
 config.default_cwd = "D:"
-config.window_background_opacity = 0.775
+config.window_background_opacity = 1
 -- NOTE: Using "Acrylic" causes window to lag when moving around in desktop
-config.win32_system_backdrop = "Acrylic"
+-- config.win32_system_backdrop = "Acrylic"
 config.window_frame = {
   active_titlebar_bg = colorScheme.background,
 }

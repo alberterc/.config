@@ -91,6 +91,38 @@ $($PSStyle.Foreground.Yellow)Examples:
     }
 }
 
+# Fuzzy find files and open in Neovim (nvim open)
+function nvop(
+    [switch]$help
+) {
+    process {
+        if ($help) {
+            $helpStr = @"
+$($PSStyle.Foreground.Yellow)Overview:
+   $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)nvop$($PSStyle.BoldOff)$($PSStyle.Reset) - Fuzzy find files and open in Neovim (nvim open -> nvop).
+
+$($PSStyle.Foreground.Yellow)Requirements:
+   $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)rg$($PSStyle.BoldOff), $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)fzf$($PSStyle.BoldOff), $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)bat$($PSStyle.BoldOff)
+"@
+            Write-Host $helpStr
+            _endDoc
+            break
+        }
+
+        if (-not (_exists rg, fzf, bat)) {
+            _endDoc
+            return
+        }
+        $file = rg --files | fzf --preview "bat --color=always --style=numbers {}" --preview-window=right:60%:wrap --border --height=90% --header="Open File in Neovim:"
+        if ($file -and (Test-Path $file)) {
+            nvim $file
+        }
+        else {
+            Write-Host "No file selected or file doesn't exist." -ForegroundColor Yellow
+        }
+    }
+}
+
 # Profile functions
 function profile(
     [switch]$reload,
@@ -128,6 +160,7 @@ $($PSStyle.Foreground.Yellow)Overview:
 `n$($PSStyle.Foreground.Yellow)Available commands in this profile:$($PSStyle.Reset)
    $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)sudo$($PSStyle.BoldOff)$($PSStyle.Reset) - Launch a new terminal or run a command with elevated user. See 'sudo -help' for more info.
    $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)which$($PSStyle.BoldOff)$($PSStyle.Reset) - Show the definition or path of a command. See 'which -help' for more info.
+   $($PSStyle.Foreground.Yellow)$($PSStyle.Bold)nvop$($PSStyle.BoldOff)$($PSStyle.Reset) - Fuzzy Search and open a file in Neovim.
 "@
             Write-Host $str
             break
@@ -173,6 +206,22 @@ $($PSStyle.Foreground.Yellow)This command is part of a powershell profile.
 Use 'profile -help' for more info.$($PSStyle.Reset)
 "@
     Write-Host $str
+}
+
+# Check commands exists/installed
+function _exists(
+    [Parameter(Mandatory = $true)]
+    [string[]]$commands
+) {
+    process {
+        foreach ($cmd in $commands) {
+            if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
+                Write-Host "$($PSStyle.Foreground.Red)Missing required command(s): $cmd.$($PSStyle.Reset)"
+                return $false
+            }
+        }
+        return $true
+    }
 }
 
 Write-Host "$($PSStyle.Foreground.Yellow)Currently using a powershell profile.$($PSStyle.Reset)"

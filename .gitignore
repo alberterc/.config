@@ -1,2 +1,6 @@
 # Nvim
 nvim/lazy-lock.json
+
+# Not needed to be shared
+.android
+scoop

@@ -27,7 +27,7 @@ $($PSStyle.Foreground.Yellow)Examples:
        in the same directory where the 'sudo' command was ran from.
 "@
             Write-Host $helpStr
-            endDoc
+            _endDoc
             break
         }
         $currPath = Get-Location
@@ -80,7 +80,7 @@ $($PSStyle.Foreground.Yellow)Examples:
        Returns the available parameters for 'Get-ChildItem'.
 "@
             Write-Host $helpStr
-            endDoc
+            _endDoc
             break
         }
 
@@ -160,13 +160,13 @@ $($PSStyle.Foreground.Yellow)Overview:
 
     end {
         if (-not $reload) {
-            endDoc
+            _endDoc
         }
     }
 }
 
 # Show that a command is part of this profile in its documentation
-function endDoc {
+function _endDoc {
     $str = @"
 
 $($PSStyle.Foreground.Yellow)This command is part of a powershell profile.

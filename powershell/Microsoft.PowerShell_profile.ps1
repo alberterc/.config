@@ -1,3 +1,6 @@
+# Hook zoxide
+Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
+
 # Run command with elevated user
 function sudo(
     [string]$command,
